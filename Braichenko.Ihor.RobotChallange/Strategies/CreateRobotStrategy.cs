@@ -3,10 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Braichenko.Ihor.RobotChallange.Analysis;
+using Robot.Common;
 
 namespace Braichenko.Ihor.RobotChallange.Strategies
 {
-    internal class CreateRobotStrategy
+    public class CreateRobotStrategy : IStrategy
     {
+        public RobotCommand TryExecute(AnalysisResult analysisResult)
+        {
+            // TODO: Logic here
+            // if (analysisResult.CanCreateRobot) {
+            //     return new CreateNewRobotCommand();
+            // }
+            return null;
+        }
     }
 }

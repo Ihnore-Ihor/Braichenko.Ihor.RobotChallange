@@ -4,25 +4,47 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using Braichenko.Ihor.RobotChallange.Analysis;
+using Braichenko.Ihor.RobotChallange.Strategies;
 using Robot.Common;
 
 namespace Braichenko.Ihor.RobotChallange
 {
     public class BraichenkoIhorAlgorythm : IRobotAlgorithm
     {
-        string IRobotAlgorithm.Author
+        public string Author => "Braichenko Ihor";
+
+        private readonly SituationAnalyzer _analyzer = new SituationAnalyzer();
+        private readonly List<IStrategy> _strategies;
+
+        public BraichenkoIhorAlgorythm()
         {
-            get { return "Braichenko Ihor"; }
+            // Priorities of strategies
+            _strategies = new List<IStrategy>
+            {
+                new CreateRobotStrategy(),
+                new CollectEnergyStrategy(),
+                new AttackStrategy(),
+                new MoveToStationStrategy(),
+                new IdleStrategy() // Backup strategy
+            };
         }
 
-        RobotCommand IRobotAlgorithm.DoStep(IList<Robot.Common.Robot> robots, int robotToMoveIndex, Map map)
+        public RobotCommand DoStep(IList<Robot.Common.Robot> robots, int robotToMoveIndex, Map map)
         {
-            var myRobot = robots[robotToMoveIndex];
+            var analysisResult = _analyzer.Analyze(robots[robotToMoveIndex], map, robots);
 
-            var newPosition = myRobot.Position;
-            newPosition.X = newPosition.X + 1;
-            newPosition.Y = newPosition.Y + 1;
-            return new MoveCommand() { NewPosition = newPosition };
+            foreach (var strategy in _strategies)
+            {
+                var command = strategy.TryExecute(analysisResult);
+                if (command != null)
+                {
+                    return command; 
+                }
+            }
+
+            // This should never happen because of the IdleStrategy
+            return new MoveCommand() { NewPosition = robots[robotToMoveIndex].Position };
         }
     }
 }
