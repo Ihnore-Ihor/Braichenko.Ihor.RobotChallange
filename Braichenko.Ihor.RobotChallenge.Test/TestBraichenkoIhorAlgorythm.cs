@@ -9,26 +9,103 @@ namespace Braichenko.Ihor.RobotChallenge.Test
     [TestClass]
     public class TestBraichenkoIhorAlgorythm
     {
-        [TestMethod]
-        public void TestDoStep_ShouldMoveRobotDownAndRight()
+        private BraichenkoIhorAlgorythm _algorithm;
+
+        [TestInitialize]
+        public void Setup()
         {
-            // Arrange
-            var algorithm = new BraichenkoIhorAlgorythm();
-            var robots = new List<Robot.Common.Robot>
+            _algorithm = new BraichenkoIhorAlgorythm();
+        }
+
+        [TestMethod]
+        public void DoStep_CheckPriority1Decision()
+        {
+            // Arrange: Create an "ideal" situation where ALL actions are possible:
+            // 1. Enough energy to create (302)
+            // 2. Robot stands near a station
+            // 3. There is a nearest free station
+            var myRobot = new Robot.Common.Robot() { Energy = 302, Position = new Position(0, 0) };
+            var map = new Map()
             {
-                new Robot.Common.Robot() { Energy = 100, Position = new Position(5, 5) }
+                Stations = new List<EnergyStation>()
+                {
+                    new EnergyStation() { Position = new Position(1, 1), Energy = 100 },
+                    new EnergyStation() { Position = new Position(10, 10), Energy = 100 }
+                }
             };
-            var map = new Map() { MaxPozition = new Position(100, 100) };
-            int robotToMoveIndex = 0;
+            var robots = new List<Robot.Common.Robot> { myRobot };
 
             // Act
-            RobotCommand command = ((IRobotAlgorithm)algorithm).DoStep(robots, robotToMoveIndex, map);
+            var command = _algorithm.DoStep(robots, 0, map);
 
             // Assert
-            Assert.IsInstanceOfType(command, typeof(MoveCommand));
+            Assert.IsInstanceOfType(command, typeof(CreateNewRobotCommand), "Creating a robot has the highest priority.");
+        }
+
+        [TestMethod]
+        public void DoStep_CheckPriority2Decision()
+        {
+            // Arrange: Not enough energy to create, but the robot stands near a station.
+            var myRobot = new Robot.Common.Robot() { Energy = 150, Position = new Position(0, 0) };
+            var map = new Map()
+            {
+                Stations = new List<EnergyStation>() { new EnergyStation() { Position = new Position(1, 1), Energy = 100 } }
+            };
+            var robots = new List<Robot.Common.Robot> { myRobot };
+
+            // Act
+            var command = _algorithm.DoStep(robots, 0, map);
+
+            // Assert
+            Assert.IsInstanceOfType(command, typeof(CollectEnergyCommand), "If creation is not possible, collecting energy is the next priority.");
+        }
+
+        [TestMethod]
+        public void DoStep_CheckPriority3Decision()
+        {
+            // Arrange: Low energy, no stations nearby.
+            var myRobot = new Robot.Common.Robot() { Energy = 150, Position = new Position(0, 0) };
+            var nearestStation = new Position(10, 10);
+            var map = new Map()
+            {
+                Stations = new List<EnergyStation>() { new EnergyStation() { Position = nearestStation, Energy = 100 } }
+            };
+            var robots = new List<Robot.Common.Robot> { myRobot };
+
+            // Act
+            var command = _algorithm.DoStep(robots, 0, map);
+
+            // Assert
+            Assert.IsInstanceOfType(command, typeof(MoveCommand), "When nothing else can be done, the robot should move.");
+            // Additional check that it moves to the correct target
+            // Important! The algorithm should return a move command for the NEXT STEP, not the final position.
+            // Let's assume our CalculateNextStep(0,0 -> 10,10) returns (1,1).
             var moveCommand = (MoveCommand)command;
-            Assert.AreEqual(6, moveCommand.NewPosition.X);
-            Assert.AreEqual(6, moveCommand.NewPosition.Y);
+            Assert.AreEqual(new Position(1, 1), moveCommand.NewPosition, "The robot should move one step towards the station.");
+        }
+
+        [TestMethod]
+        public void DoStep_CheckPriority3Decision_Attack()
+        {
+            // Arrange:
+            // 1. Cannot create (not enough energy)
+            // 2. Nothing to collect (no stations nearby)
+            // 3. There is a profitable enemy!
+            // 4. There is also a free station (but attack has higher priority)
+            var myRobot = new Robot.Common.Robot() { Energy = 200, Position = new Position(50, 50) };
+            var enemyRobot = new Robot.Common.Robot() { Energy = 1500, Position = new Position(51, 51), OwnerName = "Enemy" };
+            var freeStation = new EnergyStation() { Position = new Position(0, 0), Energy = 100 };
+
+            var map = new Map() { Stations = new List<EnergyStation>() { freeStation } };
+            var robots = new List<Robot.Common.Robot> { myRobot, enemyRobot };
+
+            // Act
+            var command = _algorithm.DoStep(robots, 0, map);
+
+            // Assert
+            Assert.IsInstanceOfType(command, typeof(MoveCommand), "There should be a move command.");
+            var moveCommand = (MoveCommand)command;
+            Assert.AreEqual(enemyRobot.Position, moveCommand.NewPosition, "Movement should be towards the enemy, since attack has priority over moving to a station.");
         }
     }
 }

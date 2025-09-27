@@ -9,11 +9,11 @@ namespace Braichenko.Ihor.RobotChallange.Analysis
 {
     public class SituationAnalyzer
     {
-        private const int CreateRobotEnergyThreshold = 200; // 100 (expense) + 100 (energy for the new robot)
+        private const int CreateRobotEnergyThreshold = 200; // 100 (expense) + 100 (energy for the new robot) 
         private const int AttackEnergyCost = 50;
         private const double StealRate = 0.05;
 
-        public AnalysisResult Analyze(Robot.Common.Robot myRobot, Map map, IList<Robot.Common.Robot> allRobots)
+        public AnalysisResult Analyze(Robot.Common.Robot myRobot, Map map, IList<Robot.Common.Robot> allRobots, int round)
         {
             var result = new AnalysisResult
             {
@@ -24,12 +24,12 @@ namespace Braichenko.Ihor.RobotChallange.Analysis
 
             // TODO: Add logic for filling in properties
             result.CanCreateRobot = myRobot.Energy > CreateRobotEnergyThreshold;
-            result.NearestFreeStation = FindNearestFreeStation(myRobot, map, allRobots);
+            result.OptimalStation = FindNearestFreeStation(myRobot, map, allRobots);
             result.CanCollectEnergy = FindNearbyStations(myRobot, map, 1).Any();
             result.ProfitableEnemyToAttack = FindProfitableEnemy(myRobot, allRobots);
 
-            if (result.NearestFreeStation != null)
-                result.NextStepToNearestStation = CalculateNextStep(myRobot.Position, result.NearestFreeStation.Position);
+            if (result.OptimalStation != null)
+                result.NextStepToNearestStation = CalculateNextStep(myRobot.Position, result.OptimalStation.Position);
 
             return result;
         }

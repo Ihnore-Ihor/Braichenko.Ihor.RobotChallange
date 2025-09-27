@@ -32,7 +32,8 @@ namespace Braichenko.Ihor.RobotChallange
 
         public RobotCommand DoStep(IList<Robot.Common.Robot> robots, int robotToMoveIndex, Map map)
         {
-            var analysisResult = _analyzer.Analyze(robots[robotToMoveIndex], map, robots);
+            int round = 0; // TEMPORARY! TODO: Get the actual round number from the game context
+            var analysisResult = _analyzer.Analyze(robots[robotToMoveIndex], map, robots, round);
 
             foreach (var strategy in _strategies)
             {
