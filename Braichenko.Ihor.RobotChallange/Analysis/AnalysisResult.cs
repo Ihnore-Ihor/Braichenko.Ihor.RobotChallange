@@ -17,7 +17,6 @@ namespace Braichenko.Ihor.RobotChallange.Analysis
         public bool CanCollectEnergy { get; set; }
         public EnergyStation OptimalStation { get; set; }
         public Robot.Common.Robot ProfitableEnemyToAttack { get; set; }
-        public Position NextStepToNearestStation { get; set; }
         public Position NextStepToTarget { get; set; }
     }
 }

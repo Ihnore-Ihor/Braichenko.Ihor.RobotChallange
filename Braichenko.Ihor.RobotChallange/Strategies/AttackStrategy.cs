@@ -12,11 +12,12 @@ namespace Braichenko.Ihor.RobotChallange.Strategies
     {
         public RobotCommand TryExecute(AnalysisResult analysisResult)
         {
-            // TODO: Logic here
-            // if (analysisResult.ProfitableEnemyToAttack != null) {
-            //     return new MoveCommand(); // when stepping towards enemy we attack automatically
-            // }
+            if (analysisResult.ProfitableEnemyToAttack != null)
+            {
+                // when stepping towards enemy we attack automatically
+                return new MoveCommand() { NewPosition = analysisResult.ProfitableEnemyToAttack.Position };
+            }
             return null;
         }
-    }
+    } 
 }

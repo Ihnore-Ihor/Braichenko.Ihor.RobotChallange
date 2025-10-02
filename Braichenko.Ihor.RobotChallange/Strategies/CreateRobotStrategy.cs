@@ -12,10 +12,10 @@ namespace Braichenko.Ihor.RobotChallange.Strategies
     {
         public RobotCommand TryExecute(AnalysisResult analysisResult)
         {
-            // TODO: Logic here
-            // if (analysisResult.CanCreateRobot) {
-            //     return new CreateNewRobotCommand();
-            // }
+            if (analysisResult.CanCreateRobot)
+            {
+                return new CreateNewRobotCommand();
+            }
             return null;
         }
     }

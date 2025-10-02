@@ -12,9 +12,10 @@ namespace Braichenko.Ihor.RobotChallange.Strategies
     {
         public RobotCommand TryExecute(AnalysisResult analysisResult)
         {
-            // TODO: Logic here
-            
-            return null;
+            // Якщо всі інші стратегії не спрацювали, пропускаємо хід.
+            // Ми повертаємо MoveCommand на поточну позицію, щоб явно 
+            // повідомити рушій про дію (пропуск ходу).
+            return new MoveCommand() { NewPosition = analysisResult.MyRobot.Position };
         }
     }
 }

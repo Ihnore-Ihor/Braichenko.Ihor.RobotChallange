@@ -63,9 +63,9 @@ namespace Braichenko.Ihor.RobotChallenge.Test
         [TestMethod]
         public void DoStep_CheckPriority3Decision()
         {
-            // Arrange: Low energy, no stations nearby.
+            // Arrange: Енергії мало (150), станцій поруч немає.
             var myRobot = new Robot.Common.Robot() { Energy = 150, Position = new Position(0, 0) };
-            var nearestStation = new Position(10, 10);
+            var nearestStation = new Position(10, 10); // Вартість стрибка = 200
             var map = new Map()
             {
                 Stations = new List<EnergyStation>() { new EnergyStation() { Position = nearestStation, Energy = 100 } }
@@ -76,12 +76,14 @@ namespace Braichenko.Ihor.RobotChallenge.Test
             var command = _algorithm.DoStep(robots, 0, map);
 
             // Assert
-            Assert.IsInstanceOfType(command, typeof(MoveCommand), "When nothing else can be done, the robot should move.");
-            // Additional check that it moves to the correct target
-            // Important! The algorithm should return a move command for the NEXT STEP, not the final position.
-            // Let's assume our CalculateNextStep(0,0 -> 10,10) returns (1,1).
+            Assert.IsInstanceOfType(command, typeof(MoveCommand), "Коли нічого іншого робити, робот повинен рухатись.");
+
+            // ОНОВЛЕНА ПЕРЕВІРКА:
+            // Алгоритм розрахує: 200/150 = 1.33 -> 2 ходи.
+            // Перший крок буде на 1/2 шляху до (10,10), тобто (5,5).
+            var expectedNextStep = new Position(5, 5);
             var moveCommand = (MoveCommand)command;
-            Assert.AreEqual(new Position(1, 1), moveCommand.NewPosition, "The robot should move one step towards the station.");
+            Assert.AreEqual(expectedNextStep, moveCommand.NewPosition, "Робот має зробити перший крок багатоходового плану.");
         }
 
         [TestMethod]

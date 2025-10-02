@@ -169,27 +169,6 @@ namespace Braichenko.Ihor.RobotChallenge.Test.Analysis
 
         #endregion
 
-        #region NextStepToTarget Tests
-
-        [DataTestMethod]
-        [DataRow(50, 50, 60, 60, 51, 51, "Move diagonally right-down")]
-        [DataRow(50, 50, 40, 40, 49, 49, "Move diagonally left-up")]
-        [DataRow(50, 50, 50, 60, 50, 51, "Move vertically down")]
-        [DataRow(50, 50, 60, 50, 51, 50, "Move horizontally right")]
-        [DataRow(50, 50, 50, 50, 50, 50, "Stay in place")]
-        public void Analyze_CalculateNextStep_ShouldMoveOneStepTowardsTarget(int startX, int startY, int endX, int endY, int nextX, int nextY, string message)
-        {
-            _myRobot.Position = new Position(startX, startY);
-            _map.Stations = new List<EnergyStation> { new EnergyStation { Position = new Position(endX, endY) } };
-
-            var result = _analyzer.Analyze(_myRobot, _map, _allRobots, 0);
-
-            // We are testing the step to the station, so we use NextStepToNearestStation
-            Assert.AreEqual(new Position(nextX, nextY), result.NextStepToNearestStation, message);
-        }
-
-        #endregion 
-
         #region Friendly Fire Prevention Tests
 
         
@@ -267,10 +246,10 @@ namespace Braichenko.Ihor.RobotChallenge.Test.Analysis
         [DataRow(300, 0, 0, 10, 10, 10, 10, "Scenario 1: Energy (300) is enough for a jump costing 200. Move directly.")]
         [DataRow(100, 0, 0, 11, 4, 6, 2, "Scenario 2: Cost is 137, energy is 100. Two moves needed (137/100=1.37 -> 2). Take the first step halfway.")]
         [DataRow(150, 10, 10, 30, 25, 14, 13, "Scenario 3: Cost is 625, energy is 150. Five moves needed (625/150=4.16 -> 5). Take the first step 1/5 of the way.")]
-        [DataRow(49, 50, 50, 40, 40, 45, 45, "Scenario 4: Cost is 200, energy is 49. Five moves needed (200/49=4.08 -> 5). Take the first step 1/5 of the way.")]
+        [DataRow(49, 50, 50, 40, 40, 48, 48, "Scenario 4: Cost is 200, energy is 49. Five moves needed (200/49=4.08 -> 5). Take the first step 1/5 of the way.")]
         [DataRow(0, 10, 10, 20, 20, 10, 10, "Scenario 5: Edge case. Zero energy. Robot should stay in place.")]
         public void Analyze_NextStep_ShouldPlanMultiStepJourneyWhenDirectJumpIsTooExpensive(
-            int energy, int startX, int startY, int targetX, int targetY, int expectedX, int expectedY, string message)
+           int energy, int startX, int startY, int targetX, int targetY, int expectedX, int expectedY, string message)
         {
             // Arrange
             _myRobot.Energy = energy;
@@ -285,8 +264,8 @@ namespace Braichenko.Ihor.RobotChallenge.Test.Analysis
             var result = _analyzer.Analyze(_myRobot, _map, _allRobots, 0);
 
             // Assert
-            Assert.IsNotNull(result.NextStepToNearestStation, message + " - The analyzer should not return null.");
-            Assert.AreEqual(expectedPosition, result.NextStepToNearestStation, message);
+            Assert.IsNotNull(result.NextStepToTarget, message + " - Аналізатор не повинен повертати null.");
+            Assert.AreEqual(expectedPosition, result.NextStepToTarget, message);
         }
 
         #endregion
