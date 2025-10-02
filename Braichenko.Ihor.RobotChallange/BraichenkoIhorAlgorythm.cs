@@ -24,9 +24,9 @@ namespace Braichenko.Ihor.RobotChallange
             // Priorities of strategies
             _strategies = new List<IStrategy>
             {
-                new CreateRobotStrategy(),      // 1. Експансія - головний пріоритет.
-                new CollectEnergyStrategy(),    // 2. Якщо не створюємо, то збираємо (якщо стоїмо на станції).
-                new MoveToStationStrategy(),    // 3. Якщо перші два неможливі - виконуємо найкращу економічну дію (рух/атака).
+                new CreateRobotStrategy(),
+                new CollectEnergyStrategy(),
+                new MoveToStationStrategy(),
                 new IdleStrategy()
             };
 
