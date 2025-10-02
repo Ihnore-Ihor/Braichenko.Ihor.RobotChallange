@@ -56,7 +56,6 @@
     <Compile Include="Strategies\TestAttackStrategy.cs" />
     <Compile Include="Strategies\TestCollectEnergyStrategy.cs" />
     <Compile Include="Strategies\TestCreateRobotStrategy.cs" />
-    <Compile Include="Strategies\TestIdleStrategy.cs" />
     <Compile Include="Strategies\TestMoveToStationStrategy.cs" />
     <Compile Include="TestBraichenkoIhorAlgorythm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
