@@ -8,18 +8,16 @@ namespace Braichenko.Ihor.RobotChallange.Analyzer
 {
     public class SituationAnalyzer
     {
-        // --- Константи для стратегії ---
         private const int CREATION_COST = 200;
         private const int SAFETY_BUFFER = 150;
 
-        // --- Константи для Гібридної Економіки ---
-        private const int EXPANSION_PHASE_ROBOT_COUNT = 80; // Межа для мирної фази "Розселення"
+        private const int EXPANSION_PHASE_ROBOT_COUNT = 80; // Threshold for peaceful "Expansion" phase
 
-        // Коефіцієнти для Фази 1 ("Розселення")
-        private const double EXPANSION_ATTACK_PENALTY_MULTIPLIER = 0.1; // Сильно штрафуємо атаку (множник)
-        private const double EXPANSION_FREE_STATION_BONUS_MULTIPLIER = 1.5; // Заохочуємо захоплення вільних станцій
+        // Coefficients for Phase 1 ("Expansion")
+        private const double EXPANSION_ATTACK_PENALTY_MULTIPLIER = 0.1; // Strongly penalize attack (multiplier)
+        private const double EXPANSION_FREE_STATION_BONUS_MULTIPLIER = 1.5; // Encourage capturing free stations
 
-        // Клас для опису найкращої дії
+        // Class describing the best action
         private class BestAction
         {
             public double Score { get; set; }
@@ -53,11 +51,11 @@ namespace Braichenko.Ihor.RobotChallange.Analyzer
             if (myRobotsCount >= 100 || round > 47) return false;
 
             int requiredEnergy;
-            if (myRobotsCount < EXPANSION_PHASE_ROBOT_COUNT) // Фаза "Розселення"
+            if (myRobotsCount < EXPANSION_PHASE_ROBOT_COUNT) // 'Expansion' phase
             {
                 requiredEnergy = CREATION_COST + 1;
             }
-            else // Фаза "Оптимізації"
+            else // 'Optimization' phase
             {
                 requiredEnergy = CREATION_COST + SAFETY_BUFFER;
             }
@@ -70,27 +68,27 @@ namespace Braichenko.Ihor.RobotChallange.Analyzer
             return myRobot.Energy >= requiredEnergy;
         }
 
-        // --- ГОЛОВНИЙ "МОЗОК" АЛГОРИТМУ ---
+
         private BestAction FindBestAction(Robot.Common.Robot myRobot, Map map, IList<Robot.Common.Robot> allRobots)
         {
-            // 1. Визначаємо поточну фазу гри
+            // 1. Determine current game phase
             int myRobotsCount = allRobots.Count(r => r.OwnerName == myRobot.OwnerName);
             bool isExpansionPhase = myRobotsCount < EXPANSION_PHASE_ROBOT_COUNT;
             var friendlyRobots = allRobots.Where(r => r.OwnerName == myRobot.OwnerName && r != myRobot).ToList();
 
-            // 2. Оцінюємо вигоду від того, щоб ЗАЛИШИТИСЯ НА МІСЦІ.
+            // 2. Evaluate benefit of STAYING PUT.
             double stayPutScore = 0;
             bool canCollectHere = false;
             var stationUnderneath = map.GetResource(myRobot.Position);
             if (stationUnderneath != null && stationUnderneath.Energy > 0)
             {
-                stayPutScore = stationUnderneath.Energy * 1.1; // Множник 1.1 - перевага для утримання позиції
+                stayPutScore = stationUnderneath.Energy * 1.1; // Multiplier 1.1 - advantage for holding position
                 canCollectHere = true;
             }
 
             var bestAction = new BestAction { Score = stayPutScore, TargetPosition = myRobot.Position, ShouldCollect = canCollectHere };
 
-            // 3. Перебираємо всі станції як АЛЬТЕРНАТИВИ.
+            // 3. Iterate over all stations as ALTERNATIVES.
             foreach (var station in map.Stations)
             {
                 if (station.Position == myRobot.Position) continue;
@@ -98,38 +96,38 @@ namespace Braichenko.Ihor.RobotChallange.Analyzer
                 var robotOnStation = allRobots.FirstOrDefault(r => r.Position == station.Position);
                 if (robotOnStation != null && robotOnStation.OwnerName == myRobot.OwnerName) continue;
 
-                // --- Розрахунок Вигоди (Potential Gain) ---
+                // --- Calculate Benefits ---
                 double potentialGain = station.Energy;
-                if (robotOnStation != null) // Якщо станція зайнята ворогом
+                if (robotOnStation != null) // If station is occupied by an enemy
                 {
-                    potentialGain += robotOnStation.Energy * 0.05; // Враховуємо вкрадену енергію
+                    potentialGain += robotOnStation.Energy * 0.05; // Account for stolen energy
 
-                    // ІНТЕГРАЦІЯ: Бонуси/штрафи за силу захисника
-                    if (robotOnStation.Energy < 100) potentialGain += 150; // Бонус за слабкого ворога
-                    else if (robotOnStation.Energy > myRobot.Energy) potentialGain -= 100; // Штраф за сильного
+                    // INTEGRATION: Bonuses/penalties for defender's strength
+                    if (robotOnStation.Energy < 100) potentialGain += 150; // Bonus for a weak enemy
+                    else if (robotOnStation.Energy > myRobot.Energy) potentialGain -= 100; // Penalty for a stronger one
                 }
 
-                // --- Розрахунок Витрат (Cost) ---
+                // --- Calculate Costs ---
                 int moveCost = CalculateToroidalDistanceSquare(myRobot.Position, station.Position);
                 bool isAttack = robotOnStation != null;
                 if (isAttack) moveCost += 50;
 
-                // --- Розрахунок Базової Оцінки (ROI) ---
+                // --- Calculate Base Score (ROI) ---
                 double moveScore = potentialGain / (moveCost + 1);
 
-                // --- Застосування Динамічних Коефіцієнтів "Гібридної Економіки" ---
+                // --- Apply Dynamic Multipliers ---
                 if (isExpansionPhase)
                 {
-                    if (isAttack) moveScore *= EXPANSION_ATTACK_PENALTY_MULTIPLIER; // Штраф за атаку
-                    else moveScore *= EXPANSION_FREE_STATION_BONUS_MULTIPLIER; // Бонус за мирне захоплення
+                    if (isAttack) moveScore *= EXPANSION_ATTACK_PENALTY_MULTIPLIER; // Penalty for attack
+                    else moveScore *= EXPANSION_FREE_STATION_BONUS_MULTIPLIER; // Bonus for peaceful capture
                 }
 
-                // --- ІНТЕГРАЦІЯ: "Територіальний Контроль" ---
+                // --- INTEGRATION: 'Territorial Control' ---
                 int competitorsCount = friendlyRobots.Count(friendly =>
                     CalculateToroidalDistanceSquare(friendly.Position, station.Position) < moveCost);
-                moveScore -= competitorsCount * 50; // Штраф за кожного союзника, що ближче до цілі
+                moveScore -= competitorsCount * 50; // Penalty for each ally closer to the target
 
-                // --- Фінальне Порівняння ---
+                // --- Final Comparison ---
                 if (moveScore > bestAction.Score)
                 {
                     bestAction = new BestAction { Score = moveScore, TargetPosition = station.Position, ShouldCollect = false };
@@ -138,7 +136,7 @@ namespace Braichenko.Ihor.RobotChallange.Analyzer
             return bestAction;
         }
 
-        // --- Допоміжні методи та методи руху ---
+        // --- Helper methods and movement methods ---
         private int Min2D(int v1, int v2, int mapSize) { int d = Math.Abs(v1 - v2); return Math.Min(d, mapSize - d); }
         private int CalculateToroidalDistanceSquare(Position p1, Position p2)
         {
