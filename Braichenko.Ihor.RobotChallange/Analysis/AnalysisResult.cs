@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Robot.Common;
 
-namespace Braichenko.Ihor.RobotChallange.Analysis
+namespace Braichenko.Ihor.RobotChallange.Analyzer
 {
     public class AnalysisResult
     {

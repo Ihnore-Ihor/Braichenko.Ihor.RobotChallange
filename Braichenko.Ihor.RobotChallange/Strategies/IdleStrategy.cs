@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Braichenko.Ihor.RobotChallange.Analysis;
+using Braichenko.Ihor.RobotChallange.Analyzer;
 using Robot.Common;
 
 namespace Braichenko.Ihor.RobotChallange.Strategies
@@ -12,7 +12,8 @@ namespace Braichenko.Ihor.RobotChallange.Strategies
     {
         public RobotCommand TryExecute(AnalysisResult analysisResult)
         {
-            return new MoveCommand() { NewPosition = analysisResult.MyRobot.Position };
+            return new CollectEnergyCommand();
+            //return new MoveCommand() { NewPosition = analysisResult.MyRobot.Position };
         }
     }
 }

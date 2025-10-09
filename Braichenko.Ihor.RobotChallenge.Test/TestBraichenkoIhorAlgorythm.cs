@@ -17,15 +17,11 @@ namespace Braichenko.Ihor.RobotChallenge.Test
             _algorithm = new BraichenkoIhorAlgorythm();
         }
 
-        /// <summary>
-        /// Перевіряє ключовий пріоритет: створення нового робота є важливішим,
-        /// ніж збір енергії, навіть якщо робот стоїть на багатій станції.
-        /// </summary>
         [TestMethod]
         public void DoStep_ShouldPrioritizeCreatingRobotOverCollectingEnergy()
         {
-            // Arrange: Робот може і створювати (достатньо енергії), і збирати (стоїть на станції).
-            _algorithm.RoundCount = 10; // Рання гра для агресивного створення
+            // Arrange
+            _algorithm.RoundCount = 10; 
             var myRobot = new Robot.Common.Robot() { Energy = 202, Position = new Position(10, 10), OwnerName = "Braichenko Ihor" };
             var map = new Map()
             {

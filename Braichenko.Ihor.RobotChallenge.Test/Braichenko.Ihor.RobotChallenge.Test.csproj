@@ -53,7 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analysis\TestSituationAnalyzer.cs" />
-    <Compile Include="Strategies\TestAttackStrategy.cs" />
     <Compile Include="Strategies\TestCollectEnergyStrategy.cs" />
     <Compile Include="Strategies\TestCreateRobotStrategy.cs" />
     <Compile Include="Strategies\TestMoveToStationStrategy.cs" />

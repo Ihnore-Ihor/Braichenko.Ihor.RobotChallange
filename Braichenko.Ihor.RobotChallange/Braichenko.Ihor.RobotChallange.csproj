@@ -48,7 +48,6 @@
     <Compile Include="Analysis\SituationAnalyzer.cs" />
     <Compile Include="BraichenkoIhorAlgorythm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Strategies\AttackStrategy.cs" />
     <Compile Include="Strategies\CollectEnergyStrategy.cs" />
     <Compile Include="Strategies\CreateRobotStrategy.cs" />
     <Compile Include="Strategies\IdleStrategy.cs" />

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
-using Braichenko.Ihor.RobotChallange.Analysis;
+using Braichenko.Ihor.RobotChallange.Analyzer;
 using Braichenko.Ihor.RobotChallange.Strategies;
 using Robot.Common;
 

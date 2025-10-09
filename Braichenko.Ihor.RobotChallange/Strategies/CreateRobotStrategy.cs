@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Braichenko.Ihor.RobotChallange.Analysis;
+using Braichenko.Ihor.RobotChallange.Analyzer;
 using Robot.Common;
 
 namespace Braichenko.Ihor.RobotChallange.Strategies
