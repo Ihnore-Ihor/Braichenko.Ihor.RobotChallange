@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Braichenko.Ihor.RobotChallange.Analyzer
+namespace Braichenko.Ihor.RobotChallange.Analysis
 {
     public class SituationAnalyzer
     {
